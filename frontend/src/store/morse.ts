@@ -99,13 +99,21 @@ export const useMorseStore = defineStore('morse', () => {
   const currentStageId = ref<number | null>(null)
   const useLearningPath = ref(false)
 
+  function isStageCompleted(stageId: number): boolean {
+    const stage = LEARNING_STAGES.find(s => s.id === stageId)
+    if (!stage) return false
+    const progress = stageProgress.value[stageId]
+    if (!progress) return false
+    return progress.correctCount >= stage.requiredCorrectCount &&
+           getAccuracy(stageId) >= stage.requiredAccuracy
+  }
+
   function initStages() {
-    learningStages.value = LEARNING_STAGES.map((stage, index) => ({
-      ...stage,
-      unlocked: index === 0 || (stageProgress.value[index]?.correctCount || 0) >= LEARNING_STAGES[index - 1].requiredCorrectCount,
-      completed: (stageProgress.value[stage.id]?.correctCount || 0) >= stage.requiredCorrectCount &&
-                 getAccuracy(stage.id) >= stage.requiredAccuracy,
-    }))
+    learningStages.value = LEARNING_STAGES.map((stage, index) => {
+      const completed = isStageCompleted(stage.id)
+      const unlocked = index === 0 || isStageCompleted(LEARNING_STAGES[index - 1].id)
+      return { ...stage, unlocked, completed }
+    })
   }
 
   function getAccuracy(stageId: number): number {
