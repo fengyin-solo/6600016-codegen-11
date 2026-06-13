@@ -12,3 +12,22 @@ export interface HistoryEntry {
   correct: boolean
   timestamp: number
 }
+
+export interface LearningStage {
+  id: number
+  name: string
+  description: string
+  chars: string[]
+  targetWpm: number
+  requiredAccuracy: number
+  requiredCorrectCount: number
+  unlocked: boolean
+  completed: boolean
+}
+
+export interface StageProgress {
+  stageId: number
+  correctCount: number
+  totalCount: number
+  bestWpm: number
+}

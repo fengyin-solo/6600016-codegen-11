@@ -3,8 +3,8 @@
     <h1 class="text-3xl font-bold text-amber-400">莫尔斯码实时训练与通讯器</h1>
 
     <!-- Tabs -->
-    <div class="flex gap-2">
-      <button v-for="tab in tabs" :key="tab.id" @click="activeTab = tab.id"
+    <div class="flex gap-2 flex-wrap">
+      <button v-for="tab in tabs" :key="tab.id" @click="selectTab(tab.id)"
         class="px-4 py-2 rounded text-sm font-medium"
         :class="activeTab === tab.id ? 'bg-amber-500 text-black' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'">
         {{ tab.label }}
@@ -35,6 +35,11 @@
         </div>
       </div>
       <WaveformDisplay />
+    </div>
+
+    <!-- Learning Path Mode -->
+    <div v-if="activeTab === 'learning'" class="flex flex-col gap-4">
+      <LearningPath />
     </div>
 
     <!-- Training Mode -->
@@ -78,14 +83,23 @@ import { useMorseStore } from './store/morse'
 import { MORSE_TABLE } from './utils/morse-code'
 import WaveformDisplay from './components/WaveformDisplay.vue'
 import TrainingMode from './components/TrainingMode.vue'
+import LearningPath from './components/LearningPath.vue'
 
 const store = useMorseStore()
 const morseTable = MORSE_TABLE
 
 const tabs = [
   { id: 'translate', label: '编码/解码' },
-  { id: 'train', label: '训练模式' },
+  { id: 'learning', label: '🚀 学习路线' },
+  { id: 'train', label: '自由训练' },
   { id: 'ref', label: '速查表' },
 ]
-const activeTab = ref('translate')
+const activeTab = ref('learning')
+
+function selectTab(tabId: string) {
+  if (tabId !== 'learning' && store.useLearningPath) {
+    store.exitLearningPath()
+  }
+  activeTab.value = tabId
+}
 </script>
